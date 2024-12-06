@@ -68,6 +68,37 @@ app.get("/employees", (req, res) => {
   });
 });
 
+app.put("/employees/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, email, phoneNumber, department, dateOfJoining, role } = req.body;
+
+  const sql =
+    "UPDATE employee SET name = ?, email = ?, phoneNumber = ?, department = ?, dateOfJoining = ?, role = ? WHERE employeeID = ?";
+  const values = [name, email, phoneNumber, department, dateOfJoining, role, id];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Error updating employee" });
+    }
+    return res.status(200).json({ message: "Employee updated successfully" });
+  });
+});
+
+app.delete("/employees/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sql = "DELETE FROM employee WHERE employeeID = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Error deleting employee" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    return res.status(200).json({ message: "Employee deleted successfully" });
+  });
+});
+
 app.listen(process.env.PORT, () => {
   console.log("Server running on port " + process.env.PORT);
 });
